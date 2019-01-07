@@ -14,27 +14,27 @@ public class LampAll extends AppCompatActivity {
             btnDecSat, btnIncSat,
             btnBack, btnInfo;
 
-    public TextView tvBrightness, tvHue, tvSaturation;
+    public TextView tvBrightness, tvHue,
+                    tvInfoBrightness, tvInfoHue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lamp_all);
 
+        tvInfoBrightness = findViewById(R.id.tvInfoBrightness);
+        tvInfoHue = findViewById(R.id.tvInfoHue);
+
         btnOn = findViewById(R.id.btnOn);
         btnOff = findViewById(R.id.btnOff);
 
-        tvBrightness = findViewById(R.id.tvBrightness);
+        tvBrightness = findViewById(R.id.tvInfoBrightness);
         btnDecBright = findViewById(R.id.btnDecBright);
         btnIncBright = findViewById(R.id.btnIncBright);
 
         tvHue = findViewById(R.id.tvHue);
         btnDecHue = findViewById(R.id.btnDecHue);
         btnIncHue = findViewById(R.id.btnIncHue);
-
-        tvSaturation = findViewById(R.id.tvSaturation);
-        btnDecSat = findViewById(R.id.btnDecSat);
-        btnIncSat = findViewById(R.id.btnIncSat);
 
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new BtnBackListener());
