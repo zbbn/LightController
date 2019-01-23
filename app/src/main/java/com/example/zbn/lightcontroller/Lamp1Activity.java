@@ -7,7 +7,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+
+import java.io.UnsupportedEncodingException;
+
 public class Lamp1Activity extends AppCompatActivity {
+    public MainActivity mainActivity;
     public Button btnOn, btnOff,
             btnDecBright, btnIncBright,
             btnDecHue, btnIncHue,
@@ -33,9 +40,21 @@ public class Lamp1Activity extends AppCompatActivity {
         tvHue = findViewById(R.id.tvHue);
         btnDecHue = findViewById(R.id.btnDecHue);
         btnIncHue = findViewById(R.id.btnIncHue);
+        btnDecHue.setOnClickListener(new BtnDecreaseHueListener());
 
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new BtnBackListener());
+
+    }
+
+    private class BtnDecreaseHueListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+
+            mainActivity.pubicLamp1();
+           
+        }
     }
 
     public void backToMainActivity(View view) {
