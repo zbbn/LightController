@@ -86,8 +86,10 @@ public class Lamp1Activity extends AppCompatActivity {
     }
 
     public void backToMainActivity(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        //Intent intent = new Intent(this, MainActivity.class);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //startActivity(intent);
+        this.finish();
     }
 
     private class BtnBackListener implements View.OnClickListener {
