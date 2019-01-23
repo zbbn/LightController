@@ -56,10 +56,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             }
         }
 
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-        beaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); // sets listener to iBeacons only.
-        beaconManager.bind(this);
 
 
         tvName = findViewById(R.id.tvName);
@@ -73,7 +69,18 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         btnLamp3.setOnClickListener(new Lamp3Listener());
         btnAll.setOnClickListener(new LampAllListener());
 
-       // controller = new Controller(this.getApplicationContext());
+        btnLamp3.setEnabled(false);
+        btnLamp1.setEnabled(false);
+        btnLamp2.setEnabled(false);
+        btnAll.setEnabled(false);
+
+        beaconManager = BeaconManager.getInstanceForApplication(this);
+        beaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); // sets listener to iBeacons only.
+        beaconManager.bind(this);
+
+
+        // controller = new Controller(this.getApplicationContext());
     }
 
     @Override
@@ -111,44 +118,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
-        beaconManager.addMonitorNotifier(new MonitorNotifier() {
-            @Override
-            public void didEnterRegion(Region region) {
-
-                // Log.i(TAG, "I just saw an beacon for the first time!" + region.getId1() + region.getUniqueId() );
-
-                if(region.getUniqueId() == "B1"){
-                    setBeacon1(true);
-
-                } else if( region.getUniqueId() == "B2"){
-                    setBeacon2(true);
-
-                } else if(region.getUniqueId() == "B3") {
-                    setBeacon3(true);
-                }
-                Log.i(TAG, "ON - Beacon1 = " + getBeacon1() + ", Beacon2 = " + getBeacon2() + ", Beacon3 = " +getBeacon3());
-            }
-
-            @Override
-            public void didExitRegion(Region region) {
-                //Log.i(TAG, "I no longer see "+  region.getId1());
-
-                if(region.getUniqueId() == "B1"){
-                    setBeacon1(false);
-                } else if( region.getUniqueId() == "B2"){
-                    setBeacon2(false);
-                } else if(region.getUniqueId() == "B3") {
-                    setBeacon3(false);
-                }
-
-                Log.i(TAG, "OFF - Beacon1 = " + getBeacon1() + ", Beacon2 = " + getBeacon2() + ", Beacon3 = " +getBeacon3());
-            }
-
-            @Override
-            public void didDetermineStateForRegion(int state, Region region) {
-                //  Log.i(TAG, "I have just switched from seeing/not seeing beacons: "+state);
-            }
-        });
 
         Identifier id1 = Identifier.parse("c59581c6-8b5c-4066-ad35-3f6d363de6dd");
         Identifier id2 = Identifier.parse("c3d4f8aa-c8ae-4a2b-8f38-856f90b3a856");
@@ -161,6 +130,63 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         } catch (RemoteException e) {
             Log.i(TAG, e.toString());
         }
+
+
+        beaconManager.addMonitorNotifier(new MonitorNotifier() {
+            @Override
+            public void didEnterRegion(Region region) {
+
+                // Log.i(TAG, "I just saw an beacon for the first time!" + region.getId1() + region.getUniqueId() );
+
+                if(region.getUniqueId().equals("B1")){
+                    setBeacon1(true);
+                    btnLamp1.setEnabled(true);
+                    Log.i(TAG, "ON - Beacon1 = " + getBeacon1());
+                } else if( region.getUniqueId().equals("B2")){
+                    setBeacon2(true);
+                    btnLamp2.setEnabled(true);
+                    Log.i(TAG, "ON - Beacon2 = " + getBeacon2());
+                } else if(region.getUniqueId().equals("B3")) {
+                    setBeacon3(true);
+                    btnLamp3.setEnabled(true);
+                    Log.i(TAG, "ON - Beacon3 = " +getBeacon3());
+                }
+                if(btnLamp1.isEnabled()&& btnLamp2.isEnabled() && btnLamp3.isEnabled()){
+                    btnAll.setEnabled(true);
+                }
+               // Log.i(TAG, "ON - Beacon1 = " + getBeacon1() + ", Beacon2 = " + getBeacon2() + ", Beacon3 = " +getBeacon3());
+                Log.i(TAG, "ON - Beacon1 = " + getBeacon1() + ", Beacon2 = " + getBeacon2() + ", Beacon3 = " +getBeacon3());
+            }
+
+            @Override
+            public void didExitRegion(Region region) {
+
+                //Log.i(TAG, "I no longer see "+  region.getId1());
+
+                if(region.getUniqueId().equals("B1")){
+                    setBeacon1(false);
+                    btnLamp1.setEnabled(false);
+                } else if( region.getUniqueId().equals("B2")){
+                    setBeacon2(false);
+                    btnLamp2.setEnabled(false);
+                } else if(region.getUniqueId().equals("B3")) {
+                    setBeacon3(false);
+                    btnLamp3.setEnabled(false);
+
+                }
+                if(!btnLamp1.isEnabled() || !btnLamp2.isEnabled() || btnLamp3.isEnabled()){
+                    btnAll.setEnabled(false);
+                }
+
+                Log.i(TAG, "OFF - Beacon1 = " + getBeacon1() + ", Beacon2 = " + getBeacon2() + ", Beacon3 = " +getBeacon3());
+            }
+
+            @Override
+            public void didDetermineStateForRegion(int state, Region region) {
+                //  Log.i(TAG, "I have just switched from seeing/not seeing beacons: "+state);
+            }
+        });
+
     }
 
     private void setBeacon1(boolean b) {
@@ -193,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     }
 
     public void lamp1Click(View view) {
-        Intent intent = new Intent(MainActivity.this, Lamp1Activity.class);
+        Intent intent = new Intent(this, Lamp1Activity.class);
 
         startActivity(intent);
 
@@ -212,14 +238,15 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 private class LampAllListener implements View.OnClickListener {
     @Override
     public void onClick(View view) {
+        if(btnAll.isClickable()) {
         lampAllClick(view);
+        }
     }
 }
 
 private class Lamp1Listener implements View.OnClickListener {
     @Override
     public void onClick(View view) {
-        //controller.decreaseLampHue("hej1");
         lamp1Click(view);
     }
 }
