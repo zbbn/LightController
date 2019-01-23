@@ -22,20 +22,6 @@ import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.Region;
 
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
-
-import java.io.UnsupportedEncodingException;
-
-
 public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     public TextView tvName;
     public Button btnLamp1, btnLamp2, btnLamp3, btnAll;
@@ -45,18 +31,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     private BeaconManager beaconManager;
     protected static final String TAG = "MonitoringActivity";
     private boolean beacon1,beacon2,beacon3;
-    private String TAG2 = "MQQTClientConnect";
-    private String TAG3 = "MQQTSUBCRIBE";
 
-    public String topic1 = "hej1"; //Lampor
-    public String topic2 = "hej2"; //Lampor
-    public String topic3 = "hej3"; //Lampor
-    public String[] topicArray = {topic1, topic2, topic3};
+    private Controller controller;
 
-    public String clientId = MqttClient.generateClientId();
-    public MqttConnectOptions options = new MqttConnectOptions();
-
-    public MqttAndroidClient client;
 
 
     @Override
@@ -81,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); // sets listener to iBeacons only.
         beaconManager.bind(this);
 
 
@@ -96,95 +73,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         btnLamp3.setOnClickListener(new Lamp3Listener());
         btnAll.setOnClickListener(new LampAllListener());
 
-
-        //options.setUserName("idkbgaxz");
-        //options.setPassword("3rqjQD0ZElLb".toCharArray());
-        //final MqttAndroidClient client = new MqttAndroidClient(this.getApplicationContext(), "tcp://m20.cloudmqtt.com:14364", clientId);
-       client = new MqttAndroidClient(this.getApplicationContext(), "tcp://m20.cloudmqtt.com:19781", clientId);
-
-        options.setUserName("mquygdwx");
-        options.setPassword("UqMtCAhpXKaS".toCharArray());
-
-        //Connect to MQTT Client
-        try {
-            IMqttToken token = client.connect(options);
-            token.setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    // We are connected
-                    Log.d(TAG2, "onSuccess");
-                    try {
-                        //Subscribe to topics/lamps | Göra 3 gånger för varje lampa eller loop?
-
-                        int qos1 = 1;
-                        int qos2 = 1;
-                        int qos3 = 1;
-                        int[] qosArray = {qos1, qos2, qos3};
-
-                        IMqttToken subToken = client.subscribe(topicArray, qosArray);
-                                //  subToken.setActionCallback(new IMqttActionListener() {
-                        //IMqttToken subToken = client.subscribe(topic2, qos1);
-                        //IMqttToken subToken3 = client.subscribe(topic3, qos);
-                        subToken.setActionCallback(new IMqttActionListener() {
-                            @Override
-                            public void onSuccess(IMqttToken iMqttToken) {
-                                //tvSuccess.setText("I AM SUBSCRIBED \n");
-                                /*
-                                byte[] encodedPayload = new byte[0];
-                                String message = "vi finns";
-                                try {
-                                    encodedPayload = message.getBytes("UTF-8");
-                                    MqttMessage mqttMessage = new MqttMessage(encodedPayload);
-                                    client.publish(topicc, mqttMessage);
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
-                                } catch (MqttPersistenceException e) {
-                                    e.printStackTrace();
-                                } catch (MqttException e) {
-                                    e.printStackTrace();
-                                } */
-                                client.setCallback(new MqttCallback() {
-                                    @Override
-                                    public void connectionLost(Throwable throwable) {
-                                        //tvSuccess.setText("Connection LOST");
-                                        Log.d(TAG3, "connetciont lost");
-                                    }
-
-                                    @Override
-                                    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-                                        //tvSuccess.append("TOPIC: " + s + " \nMESSAGE: " + new String(mqttMessage.getPayload()) + "\n");
-                                        Log.d(TAG3,"MESSAGE: " + new String(mqttMessage.getPayload()) );
-
-                                    }
-
-                                    @Override
-                                    public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-                                //tvFailure.setText(throwable.getMessage());
-                                Log.d(TAG3, "Subscribe failed....");
-                            }
-                        });
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    // Something went wrong e.g. connection timeout or firewall problems
-                    Log.d(TAG2, "onFailure");
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+       // controller = new Controller(this.getApplicationContext());
     }
 
     @Override
@@ -211,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             }
         }
     }
+
+
 
     @Override
     protected void onDestroy() {
@@ -302,8 +193,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     }
 
     public void lamp1Click(View view) {
-        Intent intent = new Intent(this, Lamp1Activity.class);
+        Intent intent = new Intent(MainActivity.this, Lamp1Activity.class);
+
         startActivity(intent);
+
     }
 
     public void lamp2Click(View view) {
@@ -326,7 +219,7 @@ private class LampAllListener implements View.OnClickListener {
 private class Lamp1Listener implements View.OnClickListener {
     @Override
     public void onClick(View view) {
-        pubicLamp1();
+        //controller.decreaseLampHue("hej1");
         lamp1Click(view);
     }
 }
@@ -347,18 +240,6 @@ private class Lamp3Listener implements View.OnClickListener {
 
 
 public void pubicLamp1() {
-    byte[] encodedPayload = new byte[0];
-    String message = "lamp 1 decrease";
-    try {
-        encodedPayload = message.getBytes("UTF-8");
-        MqttMessage mqttMessage = new MqttMessage(encodedPayload);
-        client.publish(topic1, mqttMessage);
-    } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-    } catch (MqttPersistenceException e) {
-        e.printStackTrace();
-    } catch (MqttException e) {
-        e.printStackTrace();
-    }
+
 }
 }
