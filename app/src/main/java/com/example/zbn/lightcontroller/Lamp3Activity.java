@@ -43,7 +43,7 @@ public class Lamp3Activity extends AppCompatActivity {
 
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new BtnBackListener());
-        controller = new Controller(this.getApplicationContext());
+        controller = new Controller(this.getApplicationContext(),"3");
     }
 
     public void updateValues() {

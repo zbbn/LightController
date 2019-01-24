@@ -33,23 +33,42 @@ public class Controller {
     public int lampBrightness = 0;
     public int lampHue = 0;
 
-    public Controller(Context context) {
+    public String lampRequest;
 
-        //options.setUserName("idkbgaxz");
-        //options.setPassword("3rqjQD0ZElLb".toCharArray());
+    public Controller(Context context, final String lampRequest) {
+        this.lampRequest = lampRequest;
         //final MqttAndroidClient client = new MqttAndroidClient(this.getApplicationContext(), "tcp://m20.cloudmqtt.com:14364", clientId);
-        client = new MqttAndroidClient(context, "tcp://m20.cloudmqtt.com:19781", clientId);
+        client = new MqttAndroidClient(context, "tcp://m20.cloudmqtt.com:14364", clientId);
+        options.setUserName("idkbgaxz");
+        options.setPassword("3rqjQD0ZElLb".toCharArray());
 
-        options.setUserName("mquygdwx");
-        options.setPassword("UqMtCAhpXKaS".toCharArray());
+
+        // for testing
+        //client = new MqttAndroidClient(context, "tcp://m20.cloudmqtt.com:19781", clientId);
+        //options.setUserName("mquygdwx");
+        //options.setPassword("UqMtCAhpXKaS".toCharArray());
 
         //Connect to MQTT Client
         try {
             token = client.connect(options);
-            //token.waitForCompletion();
+
+
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
+                    byte[] encodedPayload = new byte[0];
+                    String message = lampRequest;
+                    try {
+                        encodedPayload = message.getBytes("UTF-8");
+                        MqttMessage mqttMessage = new MqttMessage(encodedPayload);
+                        client.publish(topic1, mqttMessage);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    } catch (MqttPersistenceException e) {
+                        e.printStackTrace();
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
                     // We are connected
                     Log.d(TAG2, "onSuccess");
                     try {
@@ -58,13 +77,11 @@ public class Controller {
                         subToken.setActionCallback(new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken iMqttToken) {
-
-
                                 client.setCallback(new MqttCallback() {
                                     @Override
                                     public void connectionLost(Throwable throwable) {
                                         //tvSuccess.setText("Connection LOST");
-                                        Log.d(TAG3, "connetciont lost");
+                                        Log.d(TAG3, "connection lost");
                                     }
 
                                     @Override
@@ -317,7 +334,7 @@ public class Controller {
         }
     }
 
-    public void decreaseAllLamprightness() {
+    public void decreaseAllLampBrightness() {
         int i = 1;
         int decBrightness = -25;
 

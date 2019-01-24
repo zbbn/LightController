@@ -1,6 +1,5 @@
 package com.example.zbn.lightcontroller;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -51,7 +50,7 @@ public class LampAll extends AppCompatActivity {
 
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new BtnBackListener());
-        controller = new Controller(this.getApplicationContext());
+        controller = new Controller(this.getApplicationContext(),"1");
     }
 
     public void updateAllValues() {
@@ -82,7 +81,7 @@ public class LampAll extends AppCompatActivity {
     private class BtnDecreaseBrightnessListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            controller.decreaseAllLamprightness();
+            controller.decreaseAllLampBrightness();
             updateAllValues();
         }
     }
